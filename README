@@ -10,7 +10,7 @@ gem install abiquo
 
 The first version of the api just uses basic authentication, so we need to create an instance with our credentials:
 
-  auth = Abiquo::Auth('Abiquo', 'username', 'password')
+  auth = Abiquo::BasicAuth.new('Abiquo', 'username', 'password')
 
 The entry point for the Abiquo's API is an atom document service:
 
