@@ -6,10 +6,20 @@ require File.expand_path('../to_xml', __FILE__)
 require 'uri'
 
 module Abiquo
+
+  class NotAllowed < RuntimeError
+    def initialize(method, url)
+      @method = method
+      @url = url
+    end
+
+    def message
+      "Method #{@method} not allowed for #{@url}"
+    end
+  end
   
   class BasicAuth < Resourceful::BasicAuthenticator
     def can_handle?(request); true; end
-
   end
   
   module HttpAccessor
@@ -33,6 +43,13 @@ module Abiquo
     def http
       Resourceful::HttpAccessor.new(:authenticator => @auth)
     end
+
+    def rest_options
+      @rest_options ||= begin
+        response = http.resource(@url).options
+        response.header['Allow'].map {|m| m.to_sym }
+      end
+    end
     
   end
   
@@ -50,11 +67,13 @@ module Abiquo
     end
     
     def update(attrs = {})
+      raise Abiquo::NotAllowed.new(:PUT, url) unless rest_options.include?(:PUT)
       response = http.resource(url).put(attrs.to_xml(:root => object_type), :content_type => "application/xml")
       @xml = Nokogiri.parse(response.body).root
     end
     
     def delete
+      raise Abiquo::NotAllowed.new(:DELETE, url) unless rest_options.include?(:DELETE)
       http.resource(url).delete
     end
     
@@ -111,6 +130,7 @@ module Abiquo
     end
     
     def create(attrs = {})
+      raise Abiquo::NotAllowed.new(:POST, url) unless rest_options.include?(:POST)
       response = http.resource(url_with_params).post(attrs.to_xml(:root => object_type, :convert_links => true), :content_type => "application/xml")
       Resource.new(nil, @auth, Nokogiri.parse(response.body).root)
     end
