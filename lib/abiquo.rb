@@ -155,6 +155,7 @@ module Abiquo
     include HttpAccessor
     
     undef id
+    undef type
     
     delegate :inspect, :to => :get!
     
