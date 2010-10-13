@@ -20,8 +20,5 @@ rack = dc.racks.create :name => 'myrack01'
 # Create the machine
 machine = rack.machines.create :name => 'fooxen', :cpu => '2', :description => 'foo', :hd => '100000', :ram => '1024', :virtualSwitch => 'eth2', :state => 'STOPPED'
 
-pp machine
-
-
 # Create the HV
 hv = machine.hypervisor.create :type => 'XEN_3', :ip => '10.0.0.1', :port => '8889', :ipService => '10.0.0.1'
