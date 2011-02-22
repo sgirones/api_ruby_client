@@ -1,6 +1,8 @@
 require 'net/http'
 
-# From activesupport 2.3.8
+#
+# Stolen from activesupport 2.3.8
+#
 class Module
   # Provides a delegate class method to easily expose contained objects' methods
   # as your own. Pass one or more methods (specified as symbols or strings)
