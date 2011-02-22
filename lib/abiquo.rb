@@ -1,7 +1,5 @@
 require 'resourceful'
 require 'nokogiri'
-gem 'activesupport', '2.3.8'
-require 'active_support'
 require File.expand_path('../core_ext', __FILE__)
 require File.expand_path('../to_xml', __FILE__)
 require 'uri'

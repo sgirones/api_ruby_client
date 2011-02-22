@@ -50,7 +50,6 @@ spec = Gem::Specification.new do |s|
   # relevant versions
   s.add_dependency("resourceful")
   s.add_dependency("nokogiri")
-  s.add_dependency("activesupport")  # for to_xml, singularize, delegate, & try, should we implement them?
 
   # If your tests use any gems, include them here
   s.add_development_dependency("steak")

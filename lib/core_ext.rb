@@ -11,7 +11,8 @@ module Resourceful
       !add.port.blank? && add.port != 80 ? [add.host, add.port].join(':') : add.host
     end
 
-    alias_method_chain :host, :port
+    alias_method :host_without_port, :host
+    alias_method :host, :host_with_port
   end
 
   class NetHttpAdapter
@@ -23,6 +24,7 @@ module Resourceful
       end
     end
 
-    alias_method_chain :net_http_request_class, :options
+    alias_method :net_http_request_class_without_options, :net_http_request_class
+    alias_method :net_http_request_class, :net_http_request_class_with_options
   end
 end
