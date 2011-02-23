@@ -1,5 +1,6 @@
 require 'resourceful'
 require 'nokogiri'
+require File.expand_path('../active_support/inflections', __FILE__)
 require File.expand_path('../core_ext', __FILE__)
 require File.expand_path('../to_xml', __FILE__)
 require 'uri'
@@ -26,7 +27,15 @@ module Abiquo
     def xml
       @xml ||= begin
         response = http.resource(url_with_params).get
-        Nokogiri.parse(response.body).root
+        doc = Nokogiri.parse(response.body)
+        # HACK: collections have link and totalSize entities we
+        # don't want here
+        if not doc.search('/*/totalSize').empty?
+          doc.search('/*/totalSize | /*/link').each do |node|
+            node.remove
+          end
+        end
+        doc.root
       end
     end
     
@@ -131,7 +140,8 @@ module Abiquo
     def create(attrs = {})
       raise Abiquo::NotAllowed.new(:POST, url) unless rest_options.include?(:POST)
       response = http.resource(url_with_params).post(attrs.to_xml(:root => object_type, :convert_links => true), :content_type => "application/xml")
-      Resource.new(nil, @auth, Nokogiri.parse(response.body).root)
+      doc = Nokogiri.parse(response.body)
+      Resource.new(nil, @auth, doc.root)
     end
     
     private
@@ -159,7 +169,8 @@ module Abiquo
     delegate :inspect, :to => :get!
     
     def self.from_xml(xml, auth = nil)
-      new(nil, auth, Nokogiri.parse(xml).root)
+      doc = Nokogiri.parse(xml)
+      new(nil, auth, doc.root)
     end
     
     def initialize(url, auth, xml = nil, options = {})
